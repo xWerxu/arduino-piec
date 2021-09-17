@@ -25,17 +25,20 @@ int temp1 = 0; // Pierwszy próg temperatury, wyłącza się pierwszy zawór
 int temp2 = 0; // Drugi próg temperatury, wyłączają się oba zawory
 int temp3 = 0; // Załącza się syrena alarmowa, nie wyłącza się do momentu interakcji z programem
 
-int value_temp = 0;
+int chg_value = 0;
+int chg_last = 0;
 
 bool main_menu = 1;
 bool temp_done = 0;
 bool chg_done = 0;
+bool zawor_done = 0;
 
+void chg_temp();
+void chg_zawor1();
+void chg_zawor2();
+void chg_syrena();
+void chg_temp_menu();
 
-char zawor1()
-{
-
-}
 
 
 void menu_print()
@@ -96,8 +99,56 @@ void show_temp()
   
 }
 
+void chg_zawor1()
+{
+  chg_done = 0;
+  temp1 = chg_value;
+  while (chg_done == 0)
+  {
+    chg_value += encoder->getValue();
+    if (chg_value != chg_last) {
+
+      chg_last = chg_value;
+      if(chg_value < 0)
+      {
+        chg_value = 0;
+      }
+    
+    Serial.println(chg_value);
+
+
+    }
+    
+
+
+
+    if(encoder->getButton() == ClickEncoder::Clicked)
+    {
+      temp1 = chg_value;
+      chg_done = 1;
+      chg_temp();
+    }
+
+  }
+    
+}
+
+void chg_zawor2()
+{
+
+}
+
+void chg_syrena()
+{
+
+}
+
+
 void chg_temp_menu()
 {
+  chg_done = 0;
+  main_menu = 0;
+
 while (main_menu == 0 && chg_done == 0)
     {
       switch (value)
@@ -126,6 +177,13 @@ while (main_menu == 0 && chg_done == 0)
       }
 
       break;
+
+    if(encoder->getButton() == ClickEncoder::Clicked)
+    {
+      chg_done = 1;
+      main_menu = 1;
+      menu_print();
+    }
 
     }
 
@@ -167,14 +225,39 @@ void chg_temp()
 
     if(encoder->getButton() == ClickEncoder::Clicked)
     {
-      chg_done = 1;
-      main_menu = 1;
-      menu_print();
+
+      switch (value)
+      {
+        case 1:
+        chg_zawor1();
+        break;
+
+        case 2:
+        chg_zawor2();
+        break;
+
+        case 3:
+        chg_syrena();
+        break;
+
+        case 4:
+        chg_done = 1;
+        main_menu = 1;
+        break;
+
+
+        default:
+        break;
+      }
+
     }
   }
   
   
 }
+
+
+
 
 
 void loop() { 
