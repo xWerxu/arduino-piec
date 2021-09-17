@@ -25,6 +25,8 @@ int temp1 = 0; // Pierwszy próg temperatury, wyłącza się pierwszy zawór
 int temp2 = 0; // Drugi próg temperatury, wyłączają się oba zawory
 int temp3 = 0; // Załącza się syrena alarmowa, nie wyłącza się do momentu interakcji z programem
 
+int value_temp = 0;
+
 bool main_menu = 1;
 bool temp_done = 0;
 bool chg_done = 0;
@@ -41,7 +43,7 @@ void menu_print()
 
     while (main_menu == 1)
     {
-
+      value += encoder->getValue();
       switch (value)
       {
         case 1:
@@ -77,7 +79,7 @@ void show_temp()
 
     if((millis()/1000) % 5 == 0)
     {
-      Serial.println("Temper.: 26C");
+      Serial.println("Temper : 26C");
       Serial.println("Zawor 1: ON  60C");
       Serial.println("Zawor 2: OFF 80C");
       Serial.println("Syrena : OFF 100C");
@@ -94,10 +96,48 @@ void show_temp()
   
 }
 
+void chg_temp_menu()
+{
+while (main_menu == 0 && chg_done == 0)
+    {
+      switch (value)
+      {
+        case 1:
+        Serial.println(">Próg zaworu 1");
+        Serial.println(" Próg zaworu 2");
+        Serial.println(" Próg syreny");
+        break;
+
+        case 2:
+        Serial.println(" Próg zaworu 1");
+        Serial.println(">Próg zaworu 2");
+        Serial.println(" Próg syreny");
+        break;
+
+        case 3:
+        Serial.println(" Próg zaworu 1");
+        Serial.println(" Próg zaworu 2");
+        Serial.println(">Próg syreny");
+        break;
+
+        
+        default:
+        break;
+      }
+
+      break;
+
+    }
+
+
+}
+
 void chg_temp()
 {
   chg_done = 0;
   main_menu = 0;
+
+  chg_temp_menu();
 
   while(chg_done == 0)
   {
@@ -107,19 +147,18 @@ void chg_temp()
 
      last = value;
 
-      if(value > 4)
+      if(value > 3)
     {
       value = 1;
       last = 1;
 
     }else if (value < 1)
     {
-      value = 4;
-      last = 4;
+      value = 3;
+      last = 3;
     }
 
-      Serial.println("chg");
-
+    chg_temp_menu();
 
     }
     
