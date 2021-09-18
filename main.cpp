@@ -31,7 +31,15 @@ int chg_last = 0;
 bool main_menu = 1;
 bool temp_done = 0;
 bool chg_done = 0;
+bool off_done = 0;
 bool zawor_done = 0;
+bool zawor1_status = 0;
+bool zawor2_status = 0;
+
+
+long prevMillis = 0;
+unsigned long currMillis;
+int interval = 5000;
 
 void chg_temp();
 void chg_zawor1();
@@ -50,15 +58,24 @@ void menu_print()
       switch (value)
       {
         case 1:
-        case 3:
         Serial.println(">Temp i zawory");
         Serial.println(" Ustawienia temp");
+        Serial.println(" ON/OFF zawory");
+
         break;
 
         case 2:
-        case 4:
         Serial.println(" Temp i zawory");
         Serial.println(">Ustawienia temp");
+        Serial.println(" ON/OFF zawory");
+
+        break;
+
+        case 3:
+        Serial.println(" Temp i zawory");
+        Serial.println(" Ustawienia temp");
+        Serial.println(">ON/OFF zawory");
+
         break;
 
         default:
@@ -79,9 +96,11 @@ void show_temp()
 
   while(temp_done == 0)
   {
-
-    if((millis()/1000) % 5 == 0)
+    currMillis = millis();
+    if(currMillis - prevMillis > interval)
     {
+      prevMillis = currMillis;
+
       Serial.println("Temper : 26C");
       Serial.println("Zawor 1: ON  60C");
       Serial.println("Zawor 2: OFF 80C");
@@ -102,7 +121,7 @@ void show_temp()
 void chg_zawor1()
 {
   chg_done = 0;
-  temp1 = chg_value;
+  chg_value = temp1;
   while (chg_done == 0)
   {
     chg_value += encoder->getValue();
@@ -115,13 +134,8 @@ void chg_zawor1()
       }
     
     Serial.println(chg_value);
-
-
     }
     
-
-
-
     if(encoder->getButton() == ClickEncoder::Clicked)
     {
       temp1 = chg_value;
@@ -149,7 +163,7 @@ void chg_temp_menu()
   chg_done = 0;
   main_menu = 0;
 
-while (main_menu == 0 && chg_done == 0)
+while (chg_done == 0)
     {
       switch (value)
       {
@@ -157,20 +171,29 @@ while (main_menu == 0 && chg_done == 0)
         Serial.println(">Próg zaworu 1");
         Serial.println(" Próg zaworu 2");
         Serial.println(" Próg syreny");
+        Serial.println(" Powrot");
         break;
 
         case 2:
         Serial.println(" Próg zaworu 1");
         Serial.println(">Próg zaworu 2");
         Serial.println(" Próg syreny");
+        Serial.println(" Powrot");
         break;
 
         case 3:
         Serial.println(" Próg zaworu 1");
         Serial.println(" Próg zaworu 2");
         Serial.println(">Próg syreny");
+        Serial.println(" Powrot");
         break;
 
+        case 4:
+        Serial.println(" Próg zaworu 1");
+        Serial.println(" Próg zaworu 2");
+        Serial.println(" Próg syreny");
+        Serial.println(">Powrot");
+        break;
         
         default:
         break;
@@ -178,12 +201,6 @@ while (main_menu == 0 && chg_done == 0)
 
       break;
 
-    if(encoder->getButton() == ClickEncoder::Clicked)
-    {
-      chg_done = 1;
-      main_menu = 1;
-      menu_print();
-    }
 
     }
 
@@ -205,15 +222,15 @@ void chg_temp()
 
      last = value;
 
-      if(value > 3)
+      if(value > 4)
     {
       value = 1;
       last = 1;
 
     }else if (value < 1)
     {
-      value = 3;
-      last = 3;
+      value = 4;
+      last = 4;
     }
 
     chg_temp_menu();
@@ -243,6 +260,7 @@ void chg_temp()
         case 4:
         chg_done = 1;
         main_menu = 1;
+        menu_print();
         break;
 
 
@@ -258,6 +276,160 @@ void chg_temp()
 
 
 
+void offzaworyprint()
+{
+  zawor_done = 0;
+  main_menu = 0;
+
+while (zawor_done == 0)
+{
+
+    switch (value)
+    {
+    case 1:
+    if(zawor1_status == 0 && zawor2_status == 0)
+    {
+      Serial.println(">Zawor1 OFF");
+      Serial.println(" Zawor2 OFF");
+      Serial.println(" Powrot");
+    }else if(zawor1_status == 1 && zawor2_status == 0)
+    {
+      Serial.println(">Zawor1 ON");
+      Serial.println(" Zawor2 OFF");
+      Serial.println(" Powrot");
+    }else if(zawor1_status == 0 && zawor2_status == 1)
+    {
+      Serial.println(">Zawor1 OFF");
+      Serial.println(" Zawor2 ON");
+      Serial.println(" Powrot");
+    }else if(zawor1_status == 1 && zawor2_status == 1)
+    {
+      Serial.println(">Zawor1 ON");
+      Serial.println(" Zawor2 ON");
+      Serial.println(" Powrot");
+    }
+      break;
+
+    case 2:
+      if(zawor1_status == 0 && zawor2_status == 0)
+    {
+      Serial.println(" Zawor1 OFF");
+      Serial.println(">Zawor2 OFF");
+      Serial.println(" Powrot");
+    }else if(zawor1_status == 1 && zawor2_status == 0)
+    {
+      Serial.println(" Zawor1 ON");
+      Serial.println(">Zawor2 OFF");
+      Serial.println(" Powrot");
+    }else if(zawor1_status == 0 && zawor2_status == 1)
+    {
+      Serial.println(" Zawor1 OFF");
+      Serial.println(">Zawor2 ON");
+      Serial.println(" Powrot");
+    }else if(zawor1_status == 1 && zawor2_status == 1)
+    {
+      Serial.println(" Zawor1 ON");
+      Serial.println(">Zawor2 ON");
+      Serial.println(" Powrot");
+    }
+      break;
+    
+    case 3:
+      if(zawor1_status == 0 && zawor2_status == 0)
+    {
+      Serial.println(" Zawor1 OFF");
+      Serial.println(" Zawor2 OFF");
+      Serial.println(">Powrot");
+    }else if(zawor1_status == 1 && zawor2_status == 0)
+    {
+      Serial.println(" Zawor1 ON");
+      Serial.println(" Zawor2 OFF");
+      Serial.println(">Powrot");
+    }else if(zawor1_status == 0 && zawor2_status == 1)
+    {
+      Serial.println(" Zawor1 OFF");
+      Serial.println(" Zawor2 ON");
+      Serial.println(">Powrot");
+    }else if(zawor1_status == 1 && zawor2_status == 1)
+    {
+      Serial.println(" Zawor1 ON");
+      Serial.println(" Zawor2 ON");
+      Serial.println(">Powrot");
+    }
+      break;
+
+    default:
+      break;
+    }
+
+    break;
+
+  }
+
+
+}
+
+void offzawory()
+{
+  zawor_done = 0;
+  main_menu = 0;
+
+  offzaworyprint();
+
+  while(zawor_done == 0)
+  {
+    value += encoder->getValue();
+    if (value != last)
+    {
+
+     last = value;
+
+      if(value > 3)
+    {
+      value = 1;
+      last = 1;
+
+    }else if (value < 1)
+    {
+      value = 3;
+      last = 3;
+    }
+
+    offzaworyprint();
+
+    }
+
+  }
+
+
+  if(encoder->getButton() == ClickEncoder::Clicked)
+    {
+
+      switch (value)
+      {
+        case 1:
+        chg_zawor1();
+        break;
+
+        case 2:
+        chg_zawor2();
+        break;
+
+        case 3:
+        chg_done = 1;
+        main_menu = 1;
+        menu_print();
+        break;
+
+
+        default:
+        break;
+      }
+
+    }
+
+
+}
 
 
 void loop() { 
@@ -267,15 +439,15 @@ void loop() {
     
     last = value;
 
-      if(value > 4)
+      if(value > 3)
     {
       value = 1;
       last = 1;
 
     }else if (value < 1)
     {
-      value = 4;
-      last = 4;
+      value = 3;
+      last = 3;
     }
 
     // Serial.print("Encoder Value: ");
@@ -290,14 +462,15 @@ void loop() {
     switch (value)
     {
     case 1:
-    case 3:
       show_temp();
       break;
     
     case 2:
-    case 4:
       chg_temp();
       break;
+
+    case 3:
+      offzawory();
     default:
       break;
     }
