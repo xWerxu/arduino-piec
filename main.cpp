@@ -55,15 +55,31 @@ void menu_print()
       switch (value)
       {
         case 1:
-        case 3:
         Serial.println(">Temp i zawory");
         Serial.println(" Ustawienia temp");
+        Serial.println(" Zawory ON/OFF");
+        Serial.println(" System ON/OFF");
+        break;
+
+        case 3:
+        Serial.println(" Temp i zawory");
+        Serial.println(">Ustawienia temp");
+        Serial.println(" Zawory ON/OFF");
+        Serial.println(" System ON/OFF");
         break;
 
         case 2:
+        Serial.println(" Temp i zawory");
+        Serial.println(" Ustawienia temp");
+        Serial.println(">Zawory ON/OFF");
+        Serial.println(" System ON/OFF");
+        break;
+
         case 4:
         Serial.println(" Temp i zawory");
-        Serial.println(">Ustawienia temp");
+        Serial.println(" Ustawienia temp");
+        Serial.println(" Zawory ON/OFF");
+        Serial.println(">System ON/OFF");
         break;
 
         default:
