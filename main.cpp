@@ -1,6 +1,8 @@
 #include <Arduino.h>
 #include <ClickEncoder.h>
 #include <TimerOne.h>
+#include <OneWire.h>
+#include <DallasTemperature.h>
 
 ClickEncoder *encoder;
 int16_t last, value = 1;
@@ -8,6 +10,11 @@ int16_t last, value = 1;
 void timerIsr() {
   encoder->service();
 }
+
+OneWire oneWire(2);
+DallasTemperature sensors(&oneWire);
+
+DeviceAddress insideThermometer = { 0x28, 0x5F, 0x84, 0x7, 0xD6, 0x1, 0x3C, 0x57 };
 
 
 void setup() {
@@ -17,8 +24,15 @@ void setup() {
 
   Timer1.initialize(1000);
   Timer1.attachInterrupt(timerIsr);
- 
+
+  sensors.begin();
+  // if (!sensors.getAddress(insideThermometer, 0)) Serial.println("Unable to find address for Device 0"); 
+  
+
+
   last = -1;
+
+
 }
 
 unsigned long t1 = 0;
@@ -35,6 +49,8 @@ bool temp_done = 0;
 bool chg_done = 0;
 bool zawor_done = 0;
 
+bool zawor1_on = 0;
+bool zawor2_on = 0;
 bool syrena_on = 0;
 
 
@@ -98,7 +114,7 @@ void show_temp()
   temp_done = 0;
   main_menu = 0;
 
-  Serial.println("Temper : ");
+  Serial.println("Temp.  : ");
   Serial.println("Zawor 1: ");
   Serial.println("Zawor 2: ");
   Serial.println("Syrena : ");
@@ -108,7 +124,7 @@ void show_temp()
 
     if((millis()) % 5000 == 0)
     {
-      Serial.println("Temper : 26C");
+      Serial.println("Temp.  : 26C");
       Serial.println("Zawor 1: ON  60C");
       Serial.println("Zawor 2: OFF 80C");
       Serial.println("Syrena : OFF 100C");
